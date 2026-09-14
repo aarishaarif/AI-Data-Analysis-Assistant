@@ -1,0 +1,13 @@
+**/node_modules/
+**/.venv/
+frontend/dist/
+*.env
+*.db
+data/
+fastapi/data/app.db
+fastapi/data/uploads/*
+!fastapi/data/uploads/.gitkeep
+fastapi/data/charts/*
+!fastapi/data/charts/.gitkeep
+__pycache__/
+.pytest_cache/

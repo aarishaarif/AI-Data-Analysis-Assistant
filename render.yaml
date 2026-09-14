@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: insightflow-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./fastapi/Dockerfile
+    dockerContext: ./fastapi
+    healthCheckPath: /api/v1/health
+    envVars:
+      # Render free instances have temporary storage. Uploaded files, charts,
+      # conversations, and SQLite data are reset whenever the service restarts.
+      - key: DATABASE_URL
+        value: sqlite:////tmp/insightflow/app.db
+      - key: DATASET_STORAGE_PATH
+        value: /tmp/insightflow/uploads
+      - key: CHART_STORAGE_PATH
+        value: /tmp/insightflow/charts
+      - key: FRONTEND_ORIGINS
+        sync: false
+
+  - type: web
+    name: insightflow-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      # Enter https://<your-api-service>.onrender.com/api/v1 when Render prompts.
+      # Vite embeds this value into the frontend during the build.
+      - key: VITE_API_URL
+        sync: false
