@@ -5,7 +5,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     database_url: str = "sqlite:///./data/app.db"
-    max_upload_size: int = 50 * 1024 * 1024
+    # Override with MAX_UPLOAD_SIZE in production when a different limit is needed.
+    max_upload_size: int = 200 * 1024 * 1024
     default_data_ttl_hours: int = 24
     dataset_storage_path: Path = Path("./data/uploads")
     chart_storage_path: Path = Path("./data/charts")

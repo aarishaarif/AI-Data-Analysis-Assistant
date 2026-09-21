@@ -28,9 +28,19 @@ def chat(payload: ChatRequest, db: Session = Depends(get_db)):
         conversation = Conversation(dataset_id=dataset.id, title=payload.message[:80], expires_at=datetime.utcnow() + timedelta(hours=settings.default_data_ttl_hours))
         db.add(conversation)
         db.flush()
+    previous_user_message = (
+        db.query(ChatMessage)
+        .filter(ChatMessage.conversation_id == conversation.id, ChatMessage.role == "user")
+        .order_by(ChatMessage.created_at.desc())
+        .first()
+    )
     user_message = ChatMessage(conversation_id=conversation.id, role="user", content=payload.message)
     db.add(user_message)
-    content, analysis, visualization = answer_question(dataset.file_path, payload.message)
+    content, analysis, visualization = answer_question(
+        dataset.file_path,
+        payload.message,
+        previous_question=previous_user_message.content if previous_user_message else None,
+    )
     metadata = analysis | ({"chart_id": visualization["chart_id"], "chart_type": visualization["type"]} if visualization else {})
     assistant_message = ChatMessage(conversation_id=conversation.id, role="assistant", content=content, metadata_json=metadata)
     db.add(assistant_message)

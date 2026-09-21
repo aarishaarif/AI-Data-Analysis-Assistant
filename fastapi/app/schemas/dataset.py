@@ -20,3 +20,4 @@ class DatasetProfile(DatasetSummary):
     duplicate_rows: int
     numeric_summary: dict[str, dict]
     suggestions: list[str]
+    ml_profile: dict
